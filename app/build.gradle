@@ -1,0 +1,4 @@
+plugins { id 'com.android.application' }
+android { namespace 'ru.chekskan'; compileSdk 35
+ defaultConfig { applicationId 'ru.chekskan'; minSdk 26; targetSdk 35; versionCode 23; versionName '2.3' } }
+dependencies { implementation 'androidx.core:core:1.15.0'; implementation 'cz.adaptech.tesseract4android:tesseract4android:4.9.0' }
