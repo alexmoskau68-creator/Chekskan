@@ -17,7 +17,8 @@ jobs:
             mkdir -p /tmp/chekskan
             unzip -q "$ZIP" -d /tmp/chekskan
             ROOT=$(find /tmp/chekskan -name settings.gradle -type f | head -n 1 | xargs -r dirname)
-            cp -a "$ROOT"/. ./ 
+            cp -a "$ROOT"/. ./
+            rm -rf app/src/main/java/ru/receipt || true
             rm -rf /tmp/chekskan
           fi
           test -f settings.gradle
