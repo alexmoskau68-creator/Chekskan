@@ -3,29 +3,44 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Prepare full project
+        run: |
+          ZIP=$(find . -maxdepth 2 -name 'ReceiptExpenseScanner_v2.2_updated.zip' -o -name 'ReceiptExpenseScanner_Android_Project_v2.2.zip' | head -n 1)
+          if [ -n "$ZIP" ]; then
+            mkdir -p /tmp/chekskan
+            unzip -q "$ZIP" -d /tmp/chekskan
+            ROOT=$(find /tmp/chekskan -name settings.gradle -type f | head -n 1 | xargs -r dirname)
+            cp -a "$ROOT"/. ./ 
+            rm -rf /tmp/chekskan
+          fi
+          test -f settings.gradle
+          test -f app/build.gradle
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - uses: android-actions/setup-android@v3
+
       - name: Install Android SDK
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
       - name: Download Gradle
         run: |
           wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip
           unzip -q gradle-8.9-bin.zip
-      - name: Download Russian OCR data
-        run: |
-          mkdir -p app/src/main/assets/tessdata
-          curl -L --fail -o app/src/main/assets/tessdata/rus.traineddata https://github.com/tesseract-ocr/tessdata_fast/raw/main/rus.traineddata
-          curl -L --fail -o app/src/main/assets/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata
-      - name: Build debug APK
+
+      - name: Build APK
         run: ./gradle-8.9/bin/gradle --no-daemon assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
